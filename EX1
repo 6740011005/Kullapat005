@@ -1,79 +1,157 @@
-.gallery-container {
-  display: grid;
-  gap: 15px; 
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คลังรูปภาพของฉัน (Responsive Gallery)</title>
+    <style>
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 40px 0;
+        }
 
-@media (min-width: 993px) {
-  .gallery-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
+        
+        .gallery-container {
+            display: grid;
+            gap: 15px; 
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-@media (max-width: 992px) and (min-width: 768px) {
-  .gallery-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+       
+        @media (min-width: 993px) {
+            .gallery-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
 
-@media (max-width: 767px) {
-  .gallery-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+        @media (max-width: 992px) and (min-width: 768px) {
+            .gallery-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
 
-@media (max-width: 480px) {
-  .gallery-container {
-    grid-template-columns: 1fr;
-  }
-}
+        @media (max-width: 767px) {
+            .gallery-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
-.gallery-item {
-  position: relative;
-  overflow: hidden; 
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  cursor: pointer;
-}
+        @media (max-width: 480px) {
+            .gallery-container {
+                grid-template-columns: 1fr;
+            }
+        }
 
-.gallery-item img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  transition: transform 0.5s ease; 
-}
+        /* สไตล์ของแต่ละรูปภาพ */
+        .gallery-item {
+            position: relative;
+            overflow: hidden; 
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            aspect-ratio: 1 / 1; 
+        }
 
-.overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
-  opacity: 0; 
-  transition: 0.5s ease;
-  background-color: rgba(0, 0, 0, 0.6); 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover; 
+            transition: transform 0.5s ease; 
+        }
 
-.text {
-  color: white;
-  font-size: 1.2rem;
-  font-family: sans-serif;
-  border: 1px solid white;
-  padding: 10px 20px;
-}
+       
+        .overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            opacity: 0; 
+            transition: 0.5s ease;
+            background-color: rgba(0, 0, 0, 0.6); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.gallery-item:hover .overlay {
-  opacity: 1;
-}
+        .text {
+            color: white;
+            font-size: 1.2rem;
+            font-family: sans-serif;
+            border: 1px solid white;
+            padding: 10px 20px;
+        }
 
+        /* เอฟเฟกต์ Hover */
+        .gallery-item:hover .overlay {
+            opacity: 1;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h2 style="text-align: center; color: #333;">Gallery รูปภาพของฉัน</h2>
+
+    <div class="gallery-container">
+        
+        <div class="gallery-item">
+            <img src="https://picsum.photos/600/600?random=1" alt="Image 1">
+            <div class="overlay">
+                <div class="text">ดูรูปภาพ</div>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://picsum.photos/600/600?random=2" alt="Image 2">
+            <div class="overlay">
+                <div class="text">ดูรูปภาพ</div>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://picsum.photos/600/600?random=3" alt="Image 3">
+            <div class="overlay">
+                <div class="text">ดูรูปภาพ</div>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://picsum.photos/600/600?random=4" alt="Image 4">
+            <div class="overlay">
+                <div class="text">ดูรูปภาพ</div>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://picsum.photos/600/600?random=5" alt="Image 5">
+            <div class="overlay">
+                <div class="text">ดูรูปภาพ</div>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://picsum.photos/600/600?random=6" alt="Image 6">
+            <div class="overlay">
+                <div class="text">ดูรูปภาพ</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
 .gallery-item:hover img {
   transform: scale(1.1);
 }
