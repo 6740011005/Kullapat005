@@ -1,86 +1,131 @@
-import React, { useState } from 'react';
-import './App.css';
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List (Vanilla JS)</title>
+    <style>
+        /* ตกแต่งเล็กน้อยให้เหมือน App.css */
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #f4f4f4; }
+        .todo-app { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 8px; }
+        .filter-buttons { margin-bottom: 15px; display: flex; gap: 5px; }
+        .filter-buttons button { cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; background: white; }
+        .filter-buttons button.active { background: #007bff; color: white; border-color: #007bff; }
+        .todo-list { list-style: none; padding: 0; }
+        .todo-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .todo-list li.completed span { text-decoration: line-through; color: gray; }
+        .delete-btn { color: red; cursor: pointer; border: none; background: none; }
+        span { cursor: pointer; flex: 1; }
+        .status { font-size: 0.9rem; color: #666; margin-top: 15px; }
+    </style>
+</head>
+<body>
 
-function App() {
-  // 1. กำหนดสถานะ (States)
-  const [todos, setTodos] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [filter, setFilter] = useState('all'); // 'all', 'completed', 'active'
+<div class="todo-app">
+    <h1>Todo List</h1>
 
-  // 2. ฟังก์ชันการทำงาน (Actions)
-  const addTodo = (e) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
-
-    const newTodo = {
-      id: Date.now(),
-      text: inputValue,
-      completed: false,
-    };
-
-    setTodos([...todos, newTodo]);
-    setInputValue('');
-  };
-
-  const toggleTodo = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  // 3. การกรองข้อมูล (Filtering Logic)
-  const filteredTodos = todos.filter((todo) => {
-    if (filter === 'completed') return todo.completed;
-    if (filter === 'active') return !todo.completed;
-    return true; // 'all'
-  });
-
-  return (
-    <div className="todo-app">
-      <h1>Todo List (React)</h1>
-
-      {/* ฟอร์มเพิ่มรายการ */}
-      <form onSubmit={addTodo} className="input-group">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="มีอะไรที่ต้องทำบ้าง?"
-        />
+    <form id="todo-form" class="input-group">
+        <input type="text" id="todo-input" placeholder="มีอะไรที่ต้องทำบ้าง?" required>
         <button type="submit">เพิ่ม</button>
-      </form>
+    </form>
 
-      {/* ปุ่มกรอกสถานะ */}
-      <div className="filter-buttons">
-        <button onClick={() => setFilter('all')} className={filter === 'all' ? 'active' : ''}>ทั้งหมด</button>
-        <button onClick={() => setFilter('active')} className={filter === 'active' ? 'active' : ''}>ยังไม่เสร็จ</button>
-        <button onClick={() => setFilter('completed')} className={filter === 'completed' ? 'active' : ''}>เสร็จสิ้นแล้ว</button>
-      </div>
-
-      {/* รายการ Todo */}
-      <ul className="todo-list">
-        {filteredTodos.map((todo) => (
-          <li key={todo.id} className={todo.completed ? 'completed' : ''}>
-            <span onClick={() => toggleTodo(todo.id)}>
-              {todo.completed ? '✅' : '⬜'} {todo.text}
-            </span>
-            <button onClick={() => deleteTodo(todo.id)} className="delete-btn">ลบ</button>
-          </li>
-        ))}
-      </ul>
-      
-      <p className="status">
-        รายการคงเหลือ: {todos.filter(t => !t.completed).length} รายการ
-      </p>
+    <div class="filter-buttons">
+        <button onclick="setFilter('all')" id="btn-all" class="active">ทั้งหมด</button>
+        <button onclick="setFilter('active')" id="btn-active">ยังไม่เสร็จ</button>
+        <button onclick="setFilter('completed')" id="btn-completed">เสร็จสิ้นแล้ว</button>
     </div>
-  );
-}
 
-export default App;
+    <ul id="todo-list" class="todo-list"></ul>
+    
+    <p class="status" id="status-text">รายการคงเหลือ: 0 รายการ</p>
+</div>
 
+<script>
+    // --- State (จำลองสถานะแบบ React) ---
+    let todos = [];
+    let currentFilter = 'all';
+
+    const todoForm = document.getElementById('todo-form');
+    const todoInput = document.getElementById('todo-input');
+    const todoListElement = document.getElementById('todo-list');
+    const statusText = document.getElementById('status-text');
+
+    // --- Actions ---
+
+    // เพิ่มรายการ
+    todoForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = todoInput.value.trim();
+        if (!text) return;
+
+        const newTodo = {
+            id: Date.now(),
+            text: text,
+            completed: false
+        };
+
+        todos.push(newTodo);
+        todoInput.value = '';
+        render(); // วาดหน้าจอใหม่
+    });
+
+    // สลับสถานะ เสร็จ/ไม่เสร็จ
+    function toggleTodo(id) {
+        todos = todos.map(todo => 
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        render();
+    }
+
+    // ลบรายการ
+    function deleteTodo(id) {
+        todos = todos.filter(todo => todo.id !== id);
+        render();
+    }
+
+    // เปลี่ยน Filter
+    function setFilter(filter) {
+        currentFilter = filter;
+        
+        // อัปเดต Class ปุ่มที่ถูกเลือก
+        document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${filter}`).classList.add('active');
+        
+        render();
+    }
+
+    // --- Render Logic (ทำหน้าที่เหมือนส่วน Return ของ React) ---
+    function render() {
+        // กรองข้อมูลตาม State
+        const filteredTodos = todos.filter(todo => {
+            if (currentFilter === 'completed') return todo.completed;
+            if (currentFilter === 'active') return !todo.completed;
+            return true;
+        });
+
+        // ล้างรายการเก่า
+        todoListElement.innerHTML = '';
+
+        // สร้างรายการใหม่
+        filteredTodos.forEach(todo => {
+            const li = document.createElement('li');
+            li.className = todo.completed ? 'completed' : '';
+            li.innerHTML = `
+                <span onclick="toggleTodo(${todo.id})">
+                    ${todo.completed ? '✅' : '⬜'} ${todo.text}
+                </span>
+                <button class="delete-btn" onclick="deleteTodo(${todo.id})">ลบ</button>
+            `;
+            todoListElement.appendChild(li);
+        });
+
+        // อัปเดตตัวเลขคงเหลือ
+        const activeCount = todos.filter(t => !t.completed).length;
+        statusText.innerText = `รายการคงเหลือ: ${activeCount} รายการ`;
+    }
+</script>
+
+</body>
+</html>
