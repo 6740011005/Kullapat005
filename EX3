@@ -1,91 +1,104 @@
-import React, { useState, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic To-Do List (Intermediate)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .completed { text-decoration: line-through; color: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
-const ProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
+        <h1 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+            📝 รายการสิ่งที่ต้องทำ
+        </h1>
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="todoInput" placeholder="เพิ่มงานใหม่..." 
+                class="flex-1 border border-slate-200 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 transition">
+            <button id="addBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                เพิ่ม
+            </button>
+        </div>
 
-  useEffect(() => {
-    fetch('https://fakestoreapi.com/products')
-      .then((res) => {
-        if (!res.ok) throw new Error('ไม่สามารถดึงข้อมูลได้');
-        return res.json();
-      })
-      .then((data) => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-
-  const categories = ['all', ...new Set(products.map((p) => p.category))];
-
-  if (loading) return <div className="text-center p-10">กำลังโหลดข้อมูลสินค้า...</div>;
-  if (error) return <div className="text-center p-10 text-red-500">เกิดข้อผิดพลาด: {error}</div>;
-
-  return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">รายการสินค้า</h1>
-
-
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <input
-          type="text"
-          placeholder="ค้นหาชื่อสินค้า..."
-          className="border p-2 rounded w-full md:w-1/2"
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        
-        <select 
-          className="border p-2 rounded w-full md:w-1/4"
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat === 'all' ? 'ทุกหมวดหมู่' : cat}
-            </option>
-          ))}
-        </select>
-      </div>
-
-   
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <div key={product.id} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition">
-              <img 
-                src={product.image} 
-                alt={product.title} 
-                className="h-48 w-full object-contain mb-4"
-              />
-              <span className="text-xs text-blue-500 font-semibold uppercase">{product.category}</span>
-              <h3 className="font-bold text-lg line-clamp-2 h-14">{product.title}</h3>
-              <p className="text-xl text-green-600 font-bold mt-2">${product.price}</p>
-            </div>
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500">ไม่พบสินค้าที่ตรงตามเงื่อนไข</p>
-        )}
-      </div>
+        <ul id="todoList" class="space-y-3">
+            </ul>
     </div>
-  );
-};
 
-export default ProductList;
+    <script>
+        // 1. อ้างอิง Element
+        const todoInput = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
 
+        // 2. โหลดข้อมูลจาก LocalStorage เมื่อเปิดหน้าเว็บ
+        let todos = JSON.parse(localStorage.getItem('myTodos')) || [];
 
+        // ฟังก์ชันสำหรับวาดรายการ (Render)
+        function renderTodos() {
+            todoList.innerHTML = '';
+            todos.forEach((todo, index) => {
+                const li = document.createElement('li');
+                li.className = "flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100 animate-fadeIn";
+                
+                li.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+                            onchange="toggleTodo(${index})"
+                            class="w-5 h-5 cursor-pointer accent-blue-600">
+                        <span class="${todo.completed ? 'completed' : ''} text-slate-700 font-medium">
+                            ${todo.text}
+                        </span>
+                    </div>
+                    <button onclick="deleteTodo(${index})" class="text-red-400 hover:text-red-600 p-1 transition">
+                        🗑️
+                    </button>
+                `;
+                todoList.appendChild(li);
+            });
+            saveToLocalStorage();
+        }
+
+        // 3. ฟังก์ชันเพิ่มรายการ
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text !== '') {
+                todos.push({ text: text, completed: false });
+                todoInput.value = '';
+                renderTodos();
+            }
+        }
+
+        // 4. ฟังก์ชันสลับสถานะ (เสร็จสิ้น/ยังไม่เสร็จ)
+        window.toggleTodo = (index) => {
+            todos[index].completed = !todos[index].completed;
+            renderTodos();
+        };
+
+        // 5. ฟังก์ชันลบรายการ
+        window.deleteTodo = (index) => {
+            todos.splice(index, 1);
+            renderTodos();
+        };
+
+        // 6. บันทึกลง LocalStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('myTodos', JSON.stringify(todos));
+        }
+
+        // Event Listeners
+        addBtn.addEventListener('click', addTodo);
+        
+        // รองรับการกดปุ่ม Enter
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        // เริ่มต้นแสดงผล
+        renderTodos();
+    </script>
+</body>
+</html>
