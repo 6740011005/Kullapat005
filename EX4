@@ -1,0 +1,90 @@
+import React, { useState, useEffect } from 'react';
+
+const ProductList = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    fetch('https://fakestoreapi.com/products')
+      .then((res) => {
+        if (!res.ok) throw new Error('ไม่สามารถดึงข้อมูลได้');
+        return res.json();
+      })
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+
+  const categories = ['all', ...new Set(products.map((p) => p.category))];
+
+  if (loading) return <div className="text-center p-10">กำลังโหลดข้อมูลสินค้า...</div>;
+  if (error) return <div className="text-center p-10 text-red-500">เกิดข้อผิดพลาด: {error}</div>;
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">รายการสินค้า</h1>
+
+
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <input
+          type="text"
+          placeholder="ค้นหาชื่อสินค้า..."
+          className="border p-2 rounded w-full md:w-1/2"
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        
+        <select 
+          className="border p-2 rounded w-full md:w-1/4"
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat === 'all' ? 'ทุกหมวดหมู่' : cat}
+            </option>
+          ))}
+        </select>
+      </div>
+
+   
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <div key={product.id} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition">
+              <img 
+                src={product.image} 
+                alt={product.title} 
+                className="h-48 w-full object-contain mb-4"
+              />
+              <span className="text-xs text-blue-500 font-semibold uppercase">{product.category}</span>
+              <h3 className="font-bold text-lg line-clamp-2 h-14">{product.title}</h3>
+              <p className="text-xl text-green-600 font-bold mt-2">${product.price}</p>
+            </div>
+          ))
+        ) : (
+          <p className="col-span-full text-center text-gray-500">ไม่พบสินค้าที่ตรงตามเงื่อนไข</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ProductList;
+
