@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้ารายการสินค้า - ร้านค้าออนไลน์</title>
+</head>
+<body>
+
+    <main>
+        <section aria-labelledby="section-title">
+            <h2 id="section-title">สินค้าแนะนำ</h2>
+
+            <article>
+                <img src="https://via.placeholder.com/300x200" alt="หูฟังบลูทูธแบบครอบหู สีดำ">
+                <h3>หูฟังไร้สาย Noise Cancelling</h3>
+                <p>ราคา: 5,900 บาท</p>
+                <p>สัมผัสประสบการณ์เสียงที่คมชัดพร้อมระบบตัดเสียงรบกวนรอบข้างที่ยอดเยี่ยม แบตเตอรี่ใช้งานได้ยาวนาน 30 ชั่วโมง</p>
+                <button type="button">เพิ่มลงตะกร้า</button>
+            </article>
+
+            <hr> <article>
+                <img src="https://via.placeholder.com/300x200" alt="สมาร์ทวอทช์ หน้าปัดวงกลม สายยางซิลิโคน">
+                <h3>สมาร์ทวอทช์รุ่นสปอร์ต</h3>
+                <p>ราคา: 2,500 บาท</p>
+                <p>ติดตามทุกการเคลื่อนไหวและการออกกำลังกายของคุณ พร้อมวัดอัตราการเต้นของหัวใจได้ตลอด 24 ชั่วโมง</p>
+                <button type="button">เพิ่มลงตะกร้า</button>
+            </article>
+
+            <hr>
+
+            <article>
+                <img src="https://via.placeholder.com/300x200" alt="คีย์บอร์ดกลไก RGB แบบมีสาย">
+                <h3>Mechanical Keyboard RGB</h3>
+                <p>ราคา: 1,850 บาท</p>
+                <p>คีย์บอร์ดที่ปรับแต่งไฟได้ตามใจชอบ ตอบสนองไว เหมาะสำหรับทั้งการทำงานและการเล่นเกมระดับมืออาชีพ</p>
+                <button type="button">เพิ่มลงตะกร้า</button>
+            </article>
+
+        </section>
+    </main>
+
+</body>
+</html>
+
+
