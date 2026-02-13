@@ -1,54 +1,135 @@
-async function fetchAndDisplayUsers() {
-    const statusMessage = document.getElementById('status-message');
-    const container = document.getElementById('user-list-container');
-    const apiUrl = 'https://jsonplaceholder.typicode.com/users';
-
-    try {
-        // 1. ดึงข้อมูลจาก API
-        const response = await fetch(apiUrl);
-
-        // ตรวจสอบว่า Response สำเร็จหรือไม่ (เช่น status 200-299)
-        if (!response.ok) {
-            throw new Error('โครงข่ายมีปัญหาหรือไม่สามารถติดต่อ Server ได้');
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List API Fetch</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        const users = await response.json();
+        h1 {
+            color: #333;
+        }
 
-        // 2. ล้างข้อความกำลังโหลด
-        statusMessage.textContent = '';
+        #status-message {
+            margin: 20px;
+            font-weight: bold;
+            color: #666;
+        }
 
-        // 3. วนลูปสร้าง Element สำหรับผู้ใช้แต่ละคน
-        users.forEach(user => {
-            const userCard = document.createElement('article');
-            userCard.className = 'user-card';
+        .error-text {
+            color: #d9534f !important;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+        }
 
-            // สร้างเนื้อหาภายในแบบปลอดภัยด้วย textContent
-            const nameHeader = document.createElement('h3');
-            nameHeader.textContent = user.name;
+        /* Container สำหรับจัดการ Layout ของการ์ด */
+        #user-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
 
-            const usernamePara = document.createElement('p');
-            usernamePara.textContent = `Username: ${user.username}`;
+        /* สไตล์ของการ์ดผู้ใช้แต่ละคน */
+        .user-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
 
-            const emailPara = document.createElement('p');
-            emailPara.textContent = `Email: ${user.email}`;
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
 
-            // ประกอบการ์ด
-            userCard.appendChild(nameHeader);
-            userCard.appendChild(usernamePara);
-            userCard.appendChild(emailPara);
+        .user-card h3 {
+            margin-top: 0;
+            color: #007bff;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
 
-            // นำไปแสดงบนหน้าเว็บ
-            container.appendChild(userCard);
-        });
+        .user-card p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
 
-    } catch (error) {
-        // 4. จัดการกรณีเกิดข้อผิดพลาด
-        console.error('Fetch error:', error);
-        statusMessage.textContent = 'ไม่สามารถโหลดข้อมูลผู้ใช้ได้ กรุณาลองใหม่ในภายหลัง';
-        statusMessage.className = 'error-text';
-    }
-}
+    <h1>รายชื่อผู้ใช้งาน</h1>
+    
+    <div id="status-message">กำลังโหลดข้อมูล...</div>
 
-// เรียกใช้งานฟังก์ชันเมื่อโหลดหน้าเว็บ
-fetchAndDisplayUsers();
+    <main id="user-list-container"></main>
 
+    <script>
+        async function fetchAndDisplayUsers() {
+            const statusMessage = document.getElementById('status-message');
+            const container = document.getElementById('user-list-container');
+            const apiUrl = 'https://jsonplaceholder.typicode.com/users';
+
+            try {
+                // 1. ดึงข้อมูลจาก API
+                const response = await fetch(apiUrl);
+
+                // ตรวจสอบว่า Response สำเร็จหรือไม่
+                if (!response.ok) {
+                    throw new Error('โครงข่ายมีปัญหาหรือไม่สามารถติดต่อ Server ได้');
+                }
+
+                const users = await response.json();
+
+                // 2. ล้างข้อความกำลังโหลด
+                statusMessage.textContent = '';
+
+                // 3. วนลูปสร้าง Element สำหรับผู้ใช้แต่ละคน
+                users.forEach(user => {
+                    const userCard = document.createElement('article');
+                    userCard.className = 'user-card';
+
+                    // สร้างเนื้อหาภายในแบบปลอดภัยด้วย textContent
+                    const nameHeader = document.createElement('h3');
+                    nameHeader.textContent = user.name;
+
+                    const usernamePara = document.createElement('p');
+                    usernamePara.textContent = `Username: ${user.username}`;
+
+                    const emailPara = document.createElement('p');
+                    emailPara.textContent = `Email: ${user.email}`;
+
+                    // ประกอบการ์ด
+                    userCard.appendChild(nameHeader);
+                    userCard.appendChild(usernamePara);
+                    userCard.appendChild(emailPara);
+
+                    // นำไปแสดงบนหน้าเว็บ
+                    container.appendChild(userCard);
+                });
+
+            } catch (error) {
+                // 4. จัดการกรณีเกิดข้อผิดพลาด
+                console.error('Fetch error:', error);
+                statusMessage.textContent = 'ไม่สามารถโหลดข้อมูลผู้ใช้ได้ กรุณาลองใหม่ในภายหลัง';
+                statusMessage.className = 'error-text';
+            }
+        }
+
+        // เรียกใช้งานฟังก์ชันเมื่อโหลดหน้าเว็บ
+        fetchAndDisplayUsers();
+    </script>
+</body>
+</html>
