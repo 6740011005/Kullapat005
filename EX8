@@ -1,0 +1,86 @@
+import React, { useState } from 'react';
+import './App.css';
+
+function App() {
+  // 1. กำหนดสถานะ (States)
+  const [todos, setTodos] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [filter, setFilter] = useState('all'); // 'all', 'completed', 'active'
+
+  // 2. ฟังก์ชันการทำงาน (Actions)
+  const addTodo = (e) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+
+    const newTodo = {
+      id: Date.now(),
+      text: inputValue,
+      completed: false,
+    };
+
+    setTodos([...todos, newTodo]);
+    setInputValue('');
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  // 3. การกรองข้อมูล (Filtering Logic)
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === 'completed') return todo.completed;
+    if (filter === 'active') return !todo.completed;
+    return true; // 'all'
+  });
+
+  return (
+    <div className="todo-app">
+      <h1>Todo List (React)</h1>
+
+      {/* ฟอร์มเพิ่มรายการ */}
+      <form onSubmit={addTodo} className="input-group">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="มีอะไรที่ต้องทำบ้าง?"
+        />
+        <button type="submit">เพิ่ม</button>
+      </form>
+
+      {/* ปุ่มกรอกสถานะ */}
+      <div className="filter-buttons">
+        <button onClick={() => setFilter('all')} className={filter === 'all' ? 'active' : ''}>ทั้งหมด</button>
+        <button onClick={() => setFilter('active')} className={filter === 'active' ? 'active' : ''}>ยังไม่เสร็จ</button>
+        <button onClick={() => setFilter('completed')} className={filter === 'completed' ? 'active' : ''}>เสร็จสิ้นแล้ว</button>
+      </div>
+
+      {/* รายการ Todo */}
+      <ul className="todo-list">
+        {filteredTodos.map((todo) => (
+          <li key={todo.id} className={todo.completed ? 'completed' : ''}>
+            <span onClick={() => toggleTodo(todo.id)}>
+              {todo.completed ? '✅' : '⬜'} {todo.text}
+            </span>
+            <button onClick={() => deleteTodo(todo.id)} className="delete-btn">ลบ</button>
+          </li>
+        ))}
+      </ul>
+      
+      <p className="status">
+        รายการคงเหลือ: {todos.filter(t => !t.completed).length} รายการ
+      </p>
+    </div>
+  );
+}
+
+export default App;
+
